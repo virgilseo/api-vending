@@ -23,10 +23,10 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=validated_data['username'],
             password=make_password(validated_data['password']))
-        
+
         UserProfile.objects.create(user=user)
         UserProfile.objects.filter(user=user).update(
-            role = validated_data['profile']['role']
+            role=validated_data['profile']['role']
         )
 
         return user
