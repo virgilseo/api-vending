@@ -7,6 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 
 # Create your views here.
 
@@ -56,5 +57,25 @@ class UserDepositView(APIView):
             
             response['message'] = 'Only buyers can deposit coins'
             response['status'] = 400
+        
+        return Response(response)
+    
+class DepositResetView(APIView):
+    permission_classes = (IsAuthenticated,)  
+    
+    def post(self, request, format=None):
+        response ={}
+        profile = UserProfile.objects.filter(user=request.user)[0]
+        
+        if profile.role == 'buyer':
+            profile.deposit = 0
+            profile.save()
+            
+            response['message'] = 'Success'
+            response['balance'] = profile.deposit
+            
+        else:
+            request.status_code = 400
+            response['message'] = 'Only buyers can reset their deposit'
         
         return Response(response)
