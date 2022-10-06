@@ -3,6 +3,10 @@ from . models import *
 from .serializers import*
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from user.models import UserProfile
+import json
 
 # Create your views here.
 
@@ -22,3 +26,37 @@ class ProductDetailView(generics.RetrieveAPIView,
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     lookup_field = 'id'
+    
+class ProductBuyView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request, format=None):
+        response = {}
+        profile = UserProfile.objects.get(user=request.user)
+        productId = request.data['productId']
+        productAmount =  request.data['productAmount']
+        
+        if profile.role == 'buyer':
+            product = Product.objects.get(id=productId)
+            availableBalance = profile.deposit
+            
+            profile.deposit = 0
+            profile.save()
+            
+            product.amountAvailable = product.amountAvailable - productAmount
+            product.save()
+            
+            response['product'] = {
+                'name':  product.productName,
+                'cost': product.cost,
+                'available': product.amountAvailable
+            }
+            response['amount'] = productAmount
+            response['change'] = availableBalance - (product.cost * productAmount)
+        else: 
+            response['message'] = 'Only users with buyer role can make a purchase'
+            
+        return Response(response)
+            
+            
+    
