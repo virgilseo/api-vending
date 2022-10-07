@@ -39,7 +39,7 @@ Create admin user:
 ```
 python manage.py createsuperuser
 ```
-Create a local.settings.py file @ root and add these values:
+Create a local_settings.py file @ root and add these values:
 ```
 ALLOWED_HOSTS = ['localhost']
 
