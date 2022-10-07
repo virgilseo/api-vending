@@ -23,11 +23,11 @@ Next, you need to activate your virtual env:
 ```
 conda activate api_vending
 ```
-After the env is activated, cd into the folder and run this command:
+After the env is activatedrun this command:
 ```
 git clone https://github.com/virgilseo/api-vending.git
 ```
-Next, you need to run the this command to install the required packages:
+Next, cd into the folder and run this command to install the required packages:
 ```
 pip install -r requirements.txt
 ```
