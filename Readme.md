@@ -1,6 +1,6 @@
 # Vending Machine API
 
-Vending machine API, MPV code challenge.
+Vending machine API, MVP code challenge - Backend #1.
 
 ## Table of Contents
 * [Prerequisites](#prerequisites)
@@ -23,7 +23,9 @@ Next, you need to activate your virtual env:
 ```
 conda activate api_vending
 ```
-After the env is activatedrun this command:
+or create and manage your virtual enviroments anyway you wish...
+
+After the env is activated run this command:
 ```
 git clone https://github.com/virgilseo/api-vending.git
 ```
