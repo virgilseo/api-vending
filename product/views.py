@@ -24,20 +24,20 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     lookup_field = 'id'
-    
+
     def destroy(self, request, *args, **kwargs):
         response = {}
         status = 0
         instance = self.get_object()
-        if instance.sellerId == self.request.user.id: 
+        if instance.sellerId == self.request.user.id:
             self.perform_destroy(instance)
-            response['message'] = 'Product was deleted from your account' 
+            response['message'] = 'Product was deleted from your account'
             status = 200
         else:
-            response['message'] = 'Not your product' 
+            response['message'] = 'Not your product'
             status = 401
         return Response(response, status=status)
-    
+
     def patch(self, request, *args, **kwargs):
         response = {}
         status = 0
@@ -46,7 +46,19 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
         if instance.sellerId == self.request.user.id:
             return self.partial_update(request, *args, **kwargs)
         else:
-            response['message'] = 'Not your product' 
+            response['message'] = 'Not your product'
+            status = 401
+            return Response(response, status=status)
+    
+    def put(self, request, *args, **kwargs):
+        response = {}
+        status = 0
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        if instance.sellerId == self.request.user.id:
+            return self.update(request, *args, **kwargs)
+        else:
+            response['message'] = 'Not your product'
             status = 401
             return Response(response, status=status)
 
@@ -62,8 +74,10 @@ class ProductBuyView(APIView):
         if profile.role == 'buyer':
             product = Product.objects.get(id=productId)
             availableBalance = profile.deposit
+            status = 0
             # check for sufficient ballance and product availability
             if product.amountAvailable == 0:
+                status = 406
                 response['message'] = 'Not enough products left'
 
             elif profile.deposit >= product.cost:
@@ -80,10 +94,13 @@ class ProductBuyView(APIView):
                 }
                 response['change'] = availableBalance - product.cost
                 response['spent'] = product.cost
+                status = 200
             elif profile.deposit < product.cost:
+                status = 406
                 response['message'] = 'Please deposit more coins'
 
         else:
+            status = 401
             response['message'] = 'Only users with buyer role can make a purchase'
 
-        return Response(response)
+        return Response(response, status=status)
