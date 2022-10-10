@@ -34,17 +34,19 @@ class ProductBuyView(APIView):
         response = {}
         profile = UserProfile.objects.get(user=request.user)
         productId = request.data['productId']
-        productAmount = request.data['productAmount']
 
         if profile.role == 'buyer':
             product = Product.objects.get(id=productId)
             availableBalance = profile.deposit
             # check for sufficient ballance and product availability
-            if profile.deposit >= (productAmount * product.cost) and productAmount <= product.amountAvailable:
+            if product.amountAvailable == 0:
+                response['message'] = 'Not enough products left'
+
+            elif profile.deposit >= product.cost:
                 profile.deposit = 0
                 profile.save()
 
-                product.amountAvailable = product.amountAvailable - productAmount
+                product.amountAvailable = product.amountAvailable - 1
                 product.save()
 
                 response['product'] = {
@@ -52,13 +54,9 @@ class ProductBuyView(APIView):
                     'cost': product.cost,
                     'available': product.amountAvailable
                 }
-                response['amount'] = productAmount
-                response['change'] = availableBalance - \
-                    (product.cost * productAmount)
-                response['spent'] = product.cost * productAmount
-            elif productAmount >= product.amountAvailable:
-                response['message'] = 'Not enough products left'
-            else:
+                response['change'] = availableBalance - product.cost
+                response['spent'] = product.cost
+            elif profile.deposit < product.cost:
                 response['message'] = 'Please deposit more coins'
 
         else:
