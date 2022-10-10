@@ -34,7 +34,7 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
             status = 200
         else:
             response['message'] = 'Not your product'
-            status = 401
+            status = 406
         return Response(response, status=status)
 
     def patch(self, request, *args, **kwargs):
@@ -45,7 +45,7 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
             return self.partial_update(request, *args, **kwargs)
         else:
             response['message'] = 'Not your product'
-            status = 401
+            status = 406
             return Response(response, status=status)
 
     def put(self, request, *args, **kwargs):
@@ -56,7 +56,7 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
             return self.partial_update(request, *args, **kwargs)
         else:
             response['message'] = 'Not your product'
-            status = 401
+            status = 406
             return Response(response, status=status)
 
 
@@ -97,7 +97,7 @@ class ProductBuyView(APIView):
                 response['message'] = 'Please deposit more coins'
 
         else:
-            status = 401
+            status = 406
             response['message'] = 'Only users with buyer role can make a purchase'
 
         return Response(response, status=status)

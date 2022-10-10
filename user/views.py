@@ -41,6 +41,7 @@ class UserDepositView(APIView):
         ## check for appropriate coins
         deposits = [5, 10, 20, 50, 100]
         properDeposit = True
+        status = 0
         if request.data['deposit'] not in deposits:
             properDeposit = False
         
@@ -50,15 +51,17 @@ class UserDepositView(APIView):
                 profile.save()
                 
                 response['balance'] = profile.deposit
+                status = 200
             else:
                 response['message'] = 'Only 5, 10, 20, 50 or 100 coins are acceptable'
+                status = 406
             
         else:
             
             response['message'] = 'Only buyers can deposit coins'
-            response['status'] = 400
+            status = 406
         
-        return Response(response)
+        return Response(response, status=status)
     
 class DepositResetView(APIView):
     permission_classes = (IsAuthenticated,)  
@@ -66,6 +69,7 @@ class DepositResetView(APIView):
     def post(self, request, format=None):
         response ={}
         profile = UserProfile.objects.filter(user=request.user)[0]
+        status = 0
         
         if profile.role == 'buyer':
             profile.deposit = 0
@@ -73,9 +77,10 @@ class DepositResetView(APIView):
             
             response['message'] = 'Success'
             response['balance'] = profile.deposit
+            status = 200
             
         else:
-            request.status_code = 400
             response['message'] = 'Only buyers can reset their deposit'
+            status = 406
         
-        return Response(response)
+        return Response(response, status=status)
