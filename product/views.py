@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from user.models import UserProfile
-import json
 
 # Create your views here.
 
@@ -42,21 +41,19 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
         response = {}
         status = 0
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         if instance.sellerId == self.request.user.id:
             return self.partial_update(request, *args, **kwargs)
         else:
             response['message'] = 'Not your product'
             status = 401
             return Response(response, status=status)
-    
+
     def put(self, request, *args, **kwargs):
         response = {}
         status = 0
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         if instance.sellerId == self.request.user.id:
-            return self.update(request, *args, **kwargs)
+            return self.partial_update(request, *args, **kwargs)
         else:
             response['message'] = 'Not your product'
             status = 401
